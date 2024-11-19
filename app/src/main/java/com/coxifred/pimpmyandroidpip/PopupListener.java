@@ -1,6 +1,10 @@
 package com.coxifred.pimpmyandroidpip;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.Map;
 
 import fi.iki.elonen.NanoHTTPD;
@@ -12,8 +16,8 @@ public class PopupListener extends NanoHTTPD{
 
     }
 
-    public void startListener() throws IOException {
-        start(NanoHTTPD.SOCKET_READ_TIMEOUT, true);
+    public void startListener() throws Exception {
+        start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
         System.out.println("\nRunning! Point your browsers to http://localhost:8080/ \n");
     }
 
