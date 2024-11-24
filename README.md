@@ -1,4 +1,7 @@
-# PimpMyAndroidPIP
+![PimpMyAndroidPIP](https://github.com/coxifred/pimpMyAndroidPIP/blob/master/docs/logo.png?raw=true&s=100)
+
+
+# Welcome to PimpMyAndroidPIP
 
 > Purpose of this project was to allow PIP on my AndroidTV (announcing Domotic messages, pictures, camera captures, ...)
 
@@ -14,11 +17,13 @@ Install the APK file and accept overlay permission.
 
 # Launch the app:
 
-> This will automatically try to start the service and listening on local ip.
+This will automatically try to start the service and listening on local ip.
+
+ ![PimpMyAndroidPIP](https://github.com/coxifred/pimpMyAndroidPIP/blob/master/docs/capture1.png?raw=true&s=100)
 
 # Trigger message:
 
-> Make a simple curl command with this payload:
+> Make a simple *post* curl request on `8080` port with this payload:
 
 curl -X POST -d @/data.json 'http://<your_android_device_ip>:8080/'
 
@@ -54,6 +59,9 @@ curl -X POST -d @/data.json 'http://<your_android_device_ip>:8080/'
  "timeToDisplay" : 15000
 }
 ```
+
+![PimpMyAndroidPIP](https://github.com/coxifred/pimpMyAndroidPIP/blob/master/docs/capture2.png?raw=true&s=100)
+
 
 You can mix *message*, *image* and *rtcUrl*.
 
