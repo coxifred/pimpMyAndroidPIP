@@ -1,48 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
 
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false" />
     <uses-feature
         android:name="android.software.leanback"
-        android:required="false" />
+        android:required="true" />
 
     <application
         android:allowBackup="true"
-        android:usesCleartextTraffic="true"
-        android:banner="@mipmap/ic_launcher"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:banner="@mipmap/ic_launcher"
+        android:label="pimpmyandroidpip"
+        android:usesCleartextTraffic="true"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PimpMyAndroidPIP.splashscreen"
-        tools:targetApi="31">
-        <service android:name=".MainService" android:permission="android.permission.BIND_JOB_SERVICE"  android:exported="false"/>
+        android:theme="@style/Theme.AppCompat.DayNight">
 
+        <receiver
+            android:name=".services.CoxifredReceiver"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
 
-        <activity
-            android:name=".Menu"
-            android:exported="false"
-            android:label="@string/title_activity_menu"
-            android:theme="@style/Theme.PimpMyAndroidPIP.splashscreen" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.PimpMyAndroidPIP.splashscreen">
+            android:label="@string/app_name"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".SplashScreen"
-            android:exported="true"/>
+
+
+        <service
+            android:name=".services.OverlayService"
+            android:foregroundServiceType="specialUse"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="false"/>
     </application>
 
 </manifest>

@@ -1,6 +1,4 @@
 <resources>
 
-    <style name="Theme.PimpMyAndroidPIP" parent="Theme.AppCompat.DayNight.NoActionBar" />
-
-
+    <style name="Theme.MyApplication" parent="@style/Theme.Leanback" />
 </resources>
