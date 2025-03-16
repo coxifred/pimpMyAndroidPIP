@@ -3,7 +3,7 @@
 
 # Welcome to PimpMyAndroidPIP
 
-> Purpose of this project was to allow PIP on my AndroidTV (announcing Domotic messages, pictures, camera captures, ...)
+> Purpose of this project was to allow PIP on my AndroidTV (announcing Domotic messages, pictures, camera captures, put in sleep mode ...)
 
 > Inspired of https://github.com/rogro82/PiPup, (original one was unable to display non https pictures/streams)
 
@@ -21,14 +21,28 @@ This will automatically try to start the service and listening on local ip.
 
  ![PimpMyAndroidPIP](https://github.com/coxifred/pimpMyAndroidPIP/blob/master/docs/capture1.png?raw=true&s=100)
 
-# Trigger message:
+# Trigger message for sleep mode:
 
-> Make a simple *post* curl request on `8080` port with this payload:
+> Make a simple *post* curl request on `8080` port with this payload, it will mute the sound & display a black screen (convenient for scheduling sleeping from domotic external systems):
 
 curl -X POST -d @/data.json 'http://<your_android_device_ip>:8080/'
 
 ```json
 {
+ "messageType"   : "sleep",
+ "timeToSleep" : 15000
+}
+```
+
+# Trigger message for overlay popup:
+
+> Make a simple *post* curl request on `8080` port with this payload, it will display a popup in your screen (overlay mode):
+
+curl -X POST -d @/data.json 'http://<your_android_device_ip>:8080/'
+
+```json
+{
+ "messageType"   : "popup",
  "popupType"     : "SimpleMessage",
  "cardWidth"     : 400,
  "message"       : "This is a simple message",
@@ -40,6 +54,7 @@ curl -X POST -d @/data.json 'http://<your_android_device_ip>:8080/'
 
 ```json
 {
+ "messageType"   : "popup",
  "popupType"     : "SimpleMessage",
  "cardWidth"     : 400,
  "imageUrl"      : "http://192.168.2.17:1000/tmp/macaque-ouanderou.jpg",
@@ -52,6 +67,7 @@ curl -X POST -d @/data.json 'http://<your_android_device_ip>:8080/'
 > Stream rtc
 ```json
 {
+ "messageType"   : "popup",
  "popupType"     : "SimpleMessage",
  "cardWidth"     : 400,
  "message"       : "A car enter in the alley",
