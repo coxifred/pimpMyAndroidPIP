@@ -36,9 +36,10 @@ import com.coxifred.pimmyandroidpip.utils.Functions;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OverlayService extends Service  {
+public class OverlayService extends Service implements View.OnClickListener {
 
     private WindowManager wm;
+    private View clFromXml;
     private CardView aCardView;
     private TextView aTextView;
     private ConstraintLayout cl;
@@ -49,6 +50,12 @@ public class OverlayService extends Service  {
 
     // Start For Comm with activity
     private final IBinder binder = new LocalBinder();
+
+    @Override
+    public void onClick(View v) {
+        wm.removeView(clFromXml);
+    }
+
     public class LocalBinder extends Binder {
         public OverlayService getService() {
             // Return this instance of OverlayService so clients can call public methods.
@@ -158,19 +165,19 @@ public class OverlayService extends Service  {
             }
             CoxifredPopup aPopup=new CoxifredPopup();
             aPopup.setPopupType("popup");
-            aPopup.setCardWidth(1900);
-            aPopup.setCardHeight(1900);
+            aPopup.setCardWidth(2400);
+            aPopup.setCardHeight(2400);
             aPopup.setxMargin(0);
             aPopup.setyMargin(0);
             aPopup.setAlpha(256);
-            aPopup.setTextHeight(1900);
+            aPopup.setTextHeight(2400);
             aPopup.setTimeToDisplay(aSleep.getTimeToSleep());
             aPopup.setTextBackgroundColor(Color.BLACK);
             aPopup.setCardBackgroundColor(Color.BLACK);
             aPopup.setMessageType("SimpleMessage");
             aPopup.setMessage("Sleeping mode");
             aPopup.setDetail("");
-            aPopup.setTimeToDisplay(10000L);
+            aPopup.setTimeToDisplay(aSleep.getTimeToSleep());
             simpleMessage(aPopup);
 
         }
@@ -183,7 +190,7 @@ public class OverlayService extends Service  {
         Functions.log("DBG","Displaying a popup","OverlayService.simpleMessage");
 
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-        View clFromXml = inflater.inflate(R.layout.popuplayout, null);
+        clFromXml = inflater.inflate(R.layout.popuplayout, null);
         clFromXml.getBackground().setAlpha(aPopup.getAlpha());
         CardView cardView=clFromXml.findViewById(R.id.card);
         cardView.getBackground().setAlpha(aPopup.getAlpha());
@@ -248,6 +255,9 @@ public class OverlayService extends Service  {
         }else{
             title.setHeight(1);
             title.setVisibility(TextView.INVISIBLE);
+        }
+        if ( aPopup.getMessage().equals("Sleeping mode")) {
+            title.setOnClickListener(this);
         }
 
         TextView detail=clFromXml.findViewById(R.id.detail);
