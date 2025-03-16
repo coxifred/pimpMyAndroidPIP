@@ -30,7 +30,7 @@ curl -X POST -d @/data.json 'http://<your_android_device_ip>:8080/'
 ```json
 {
  "messageType"   : "sleep",
- "timeToDisplay" : 15000
+ "timeToSleep" : 15000
 }
 ```
 
