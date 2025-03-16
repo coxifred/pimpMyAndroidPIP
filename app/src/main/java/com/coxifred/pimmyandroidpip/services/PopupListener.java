@@ -1,6 +1,8 @@
 package com.coxifred.pimmyandroidpip.services;
 
+import com.coxifred.pimmyandroidpip.beans.AbstractMessage;
 import com.coxifred.pimmyandroidpip.beans.CoxifredPopup;
+import com.coxifred.pimmyandroidpip.beans.CoxifredSleep;
 import com.coxifred.pimmyandroidpip.utils.Functions;
 import com.google.gson.Gson;
 
@@ -10,7 +12,6 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.HashMap;
 
 import fi.iki.elonen.NanoHTTPD;
 
@@ -118,7 +119,11 @@ public class PopupListener extends NanoHTTPD{
         {
             StringBuilder strb=new StringBuilder();
             strb.append("<html><body>");
-                strb.append("<h1>Welcome to PimpMyAndroidPip</h1>");
+                strb.append("<h1>Welcome to PimpMyAndroidPip</h1><br>");
+                for ( String aLogLine : Functions.messages)
+                {
+                    strb.append(aLogLine).append("<br>");
+                }
             strb.append("</body></html>");
 
             return newFixedLengthResponse(strb.toString());
@@ -126,18 +131,27 @@ public class PopupListener extends NanoHTTPD{
         else if (aMethod.equals("POST"))
         {
             try {
-                session.parseBody(new HashMap<>());
-                String requestBody = session.getQueryParameterString();
+                int contentLength = Integer.parseInt(session.getHeaders().get("content-length"));
+                byte[] buffer = new byte[contentLength];
+                session.getInputStream().read(buffer, 0, contentLength);
+                //session.parseBody(new HashMap<>());
+                String requestBody = new String(buffer);
                 Functions.log("DBG","Post data " + requestBody,"PopupListener.serve");
                 try {
-                    Functions.log("DBG","Trying to json parse " + requestBody,"PopupListener.serve");
-                    Gson aGson=new Gson();
-                    CoxifredPopup cp=aGson.fromJson(requestBody, CoxifredPopup.class);
-                    cp.internalLoad();
+                    Functions.log("DBG", "Trying to json parse " + requestBody, "PopupListener.serve");
+                    Gson aGson = new Gson();
+                    AbstractMessage am = aGson.fromJson(requestBody, AbstractMessage.class);
                     Functions.log("DBG","Successfully parsed","PopupListener.serve");
+                    if (am.getMessageType().equals("popup")) {
+                        CoxifredPopup cp=aGson.fromJson(requestBody, CoxifredPopup.class);
+                        cp.internalLoad();
+                        OverlayService.toDisplay.add(cp);
+                        Functions.log("DBG","Sent to the background service","PopupListener.serve");
+                    } else if (am.getMessageType().equals("sleep")) {
+                        CoxifredSleep cs=aGson.fromJson(requestBody, CoxifredSleep.class);
+                        OverlayService.toSleep.add(cs);
+                    }
 
-                    OverlayService.toDisplay.add(cp);
-                    Functions.log("DBG","Sent to the background service","PopupListener.serve");
 
                 }catch (Exception e)
                 {

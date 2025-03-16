@@ -21,6 +21,9 @@ import com.coxifred.pimmyandroidpip.beans.CoxifredPopup;
 import com.coxifred.pimmyandroidpip.services.OverlayService;
 import com.coxifred.pimmyandroidpip.utils.Functions;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 /*
  * Main Activity class that loads {@link MainFragment}.
  */
@@ -167,6 +170,35 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             CoxifredPopup cp=new CoxifredPopup();
             cp.setMessage("This is a test");
             OverlayService.toDisplay.add(cp);
+            Thread thread = new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        try {
+                            URL url = new URL("http://localhost:8080");
+                            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                            con.setRequestMethod("GET");
+                            int status = con.getResponseCode();
+                            if (status == 200) {
+                                Functions.log("INF","Success to reach through HTTP Request","MainActivity.test");
+                            } else {
+                                Functions.log("ERR","Got not HTTP200 code through HTTP Request","MainActivity.test");
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Functions.log("ERR","Got error through HTTP Request " + e.toString(),"MainActivity.test");
+                            e.printStackTrace();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            thread.start();
+
         }
 
         if (view.getId()==R.id.reduceButton) {
@@ -179,8 +211,13 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     @Override
     protected void onStop() {
         super.onStop();
-        unbindService(connection);
-        mBound = false;
+        try {
+            unbindService(connection);
+            mBound = false;
+        }catch (Exception e)
+        {
+            Functions.log("WNG",e.toString(),"MainActivity.onStop()");
+        }
     }
 
     /** Defines callbacks for service binding, passed to bindService(). */

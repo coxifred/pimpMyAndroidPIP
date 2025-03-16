@@ -16,7 +16,7 @@ import java.util.List;
 
 public class Functions {
 
-    static List<String> messages=new ArrayList<String>();
+    public static List<String> messages=new ArrayList<String>();
 
     public static String getDateFormat(Date date, String format_Ex_YYYY_MM_DD) {
         if (format_Ex_YYYY_MM_DD == null) {

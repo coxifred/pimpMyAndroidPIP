@@ -4,20 +4,87 @@ import android.graphics.Bitmap;
 
 import com.coxifred.pimmyandroidpip.utils.Functions;
 
-public class CoxifredPopup {
+public class CoxifredPopup  extends AbstractMessage{
 
     String popupType="SimpleMessage";
     Integer cardWidth=400;
+    Integer cardHeight=0;
     String message="";
+
+
+
     String detail="";
     String imageUrl="";
+    String imageIconUrl="";
     String rtcUrl="";
     Integer rtcHeight=400;
     Integer rtcScale=50;
     Integer imageWidth=200;
     Integer imageHeight;
+    Integer xMargin=0;
+    Integer alpha=50;
+    Integer yMargin=0;
+    Integer textHeight=1;
+    Integer textBackgroundColor=-1;
+    Integer cardBackgroundColor=-1;
     Bitmap imageBitmap;
+    Bitmap imageIconBitmap;
     Long timeToDisplay=10000L;
+
+    public Bitmap getImageIconBitmap() {
+        return imageIconBitmap;
+    }
+
+    public void setImageIconBitmap(Bitmap imageIconBitmap) {
+        this.imageIconBitmap = imageIconBitmap;
+    }
+
+    public Integer getCardBackgroundColor() {
+        return cardBackgroundColor;
+    }
+
+    public void setCardBackgroundColor(Integer cardBackgroundColor) {
+        this.cardBackgroundColor = cardBackgroundColor;
+    }
+
+    public Integer getTextBackgroundColor() {
+        return textBackgroundColor;
+    }
+
+    public void setTextBackgroundColor(Integer textBackgroundColor) {
+        this.textBackgroundColor = textBackgroundColor;
+    }
+
+    public Integer getCardHeight() {
+        return cardHeight;
+    }
+
+    public Integer getTextHeight() {
+        return textHeight;
+    }
+
+    public void setTextHeight(Integer textHeight) {
+        this.textHeight = textHeight;
+    }
+
+    public Integer getAlpha() {
+        return alpha;
+    }
+
+    public void setAlpha(Integer alpha) {
+        this.alpha = alpha;
+    }
+
+    public void setCardHeight(Integer cardHeight) {
+        this.cardHeight = cardHeight;
+    }
+    public String getImageIconUrl() {
+        return imageIconUrl;
+    }
+
+    public void setImageIconUrl(String imageIconUrl) {
+        this.imageIconUrl = imageIconUrl;
+    }
 
     public Integer getRtcScale() {
         return rtcScale;
@@ -115,6 +182,22 @@ public class CoxifredPopup {
         this.popupType = popupType;
     }
 
+    public Integer getxMargin() {
+        return xMargin;
+    }
+
+    public void setxMargin(Integer xMargin) {
+        this.xMargin = xMargin;
+    }
+
+    public Integer getyMargin() {
+        return yMargin;
+    }
+
+    public void setyMargin(Integer yMargin) {
+        this.yMargin = yMargin;
+    }
+
     public void internalLoad()
     {
         if ( ! "".equals(imageUrl) )
@@ -136,6 +219,13 @@ public class CoxifredPopup {
             }
 
             imageBitmap=Bitmap.createScaledBitmap(Functions.getImageBitmap(imageUrl), getImageWidth(),getImageHeight(), true);
+
+        }
+
+        if ( ! "".equals(imageIconUrl) )
+        {
+            Bitmap aBitmap=Functions.getImageBitmap(imageIconUrl);
+            imageIconBitmap=Functions.getImageBitmap(imageIconUrl);
 
         }
     }

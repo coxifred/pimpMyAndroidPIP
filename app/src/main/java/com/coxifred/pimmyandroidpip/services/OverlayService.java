@@ -6,7 +6,9 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.media.AudioManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
@@ -28,6 +30,7 @@ import androidx.core.app.NotificationCompat;
 
 import com.coxifred.pimmyandroidpip.R;
 import com.coxifred.pimmyandroidpip.beans.CoxifredPopup;
+import com.coxifred.pimmyandroidpip.beans.CoxifredSleep;
 import com.coxifred.pimmyandroidpip.utils.Functions;
 
 import java.util.ArrayList;
@@ -42,6 +45,7 @@ public class OverlayService extends Service  {
     private HttpServerManager httpServerManager;
     private Handler handler=new Handler();
     public static List<CoxifredPopup> toDisplay=new ArrayList<CoxifredPopup>();
+    public static List<CoxifredSleep> toSleep=new ArrayList<CoxifredSleep>();
 
     // Start For Comm with activity
     private final IBinder binder = new LocalBinder();
@@ -116,6 +120,7 @@ public class OverlayService extends Service  {
             @Override
             public void run() {
                         performPopups();
+                        performMuteAndBlackScreen();
                         handler.postDelayed(this,1000);
 
             }
@@ -140,35 +145,108 @@ public class OverlayService extends Service  {
 
     }
 
+    public void performMuteAndBlackScreen()
+    {
+        for ( CoxifredSleep aSleep:toSleep)
+        {
+            Functions.log("DBG","Muting sound application ","OverlayService.performMuteAndBlackScreen");
+            AudioManager aManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                aManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_MUTE, 0);
+            } else {
+                aManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0);
+            }
+            CoxifredPopup aPopup=new CoxifredPopup();
+            aPopup.setPopupType("popup");
+            aPopup.setCardWidth(1900);
+            aPopup.setCardHeight(1900);
+            aPopup.setxMargin(0);
+            aPopup.setyMargin(0);
+            aPopup.setAlpha(256);
+            aPopup.setTextHeight(1900);
+            aPopup.setTimeToDisplay(aSleep.getTimeToSleep());
+            aPopup.setTextBackgroundColor(Color.BLACK);
+            aPopup.setCardBackgroundColor(Color.BLACK);
+            aPopup.setMessageType("SimpleMessage");
+            aPopup.setMessage("Sleeping mode");
+            aPopup.setDetail("");
+            aPopup.setTimeToDisplay(10000L);
+            simpleMessage(aPopup);
+
+        }
+        toSleep.clear();
+
+    }
+
     public void simpleMessage(CoxifredPopup aPopup)
     {
         Functions.log("DBG","Displaying a popup","OverlayService.simpleMessage");
 
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         View clFromXml = inflater.inflate(R.layout.popuplayout, null);
+        clFromXml.getBackground().setAlpha(aPopup.getAlpha());
         CardView cardView=clFromXml.findViewById(R.id.card);
-        cardView.setLayoutParams(new ViewGroup.LayoutParams(aPopup.getCardWidth(),ViewGroup.LayoutParams.WRAP_CONTENT));
+        cardView.getBackground().setAlpha(aPopup.getAlpha());
+
+        if ( ! aPopup.getCardBackgroundColor().equals(-1) ) {
+            cardView.setBackgroundColor(aPopup.getCardBackgroundColor());
+        }
+        cardView.setBackgroundColor(Color.BLACK);
+        if ( ! aPopup.getCardHeight().equals(0)) {
+            cardView.setLayoutParams(new ViewGroup.LayoutParams(aPopup.getCardWidth(), ViewGroup.LayoutParams.WRAP_CONTENT));
+        }else
+        {
+            cardView.setLayoutParams(new ViewGroup.LayoutParams(aPopup.getCardWidth(), aPopup.getCardHeight()));
+        }
 
         WebView mWebview = clFromXml.findViewById(R.id.web_view);
         if ( ! "".equals(aPopup.getRtcUrl())) {
             mWebview.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, aPopup.getRtcHeight()));
             mWebview.loadUrl(aPopup.getRtcUrl());
             mWebview.setInitialScale(aPopup.getRtcScale());
+            mWebview.setBackgroundColor(Color.BLUE);
             WebSettings set = mWebview.getSettings();
-            set.setUseWideViewPort(true);
+            set.setUseWideViewPort(false);
             set.setLoadWithOverviewMode(true);
+            //mWebview.setBackground(Color.BLUE);
             set.setJavaScriptEnabled(true);
-            set.setBuiltInZoomControls(true);
+            set.setBuiltInZoomControls(false);
         }else {
+            mWebview.setVisibility(WebView.INVISIBLE);
             mWebview.setLayoutParams(new ViewGroup.LayoutParams(1, 1));
-            mWebview.setVisibility(View.INVISIBLE);
+        }
+
+        ImageView iv=clFromXml.findViewById(R.id.header_image);
+        if ( ! "".equals(aPopup.getImageUrl()) && aPopup.getImageBitmap() != null) {
+            iv.setImageBitmap(aPopup.getImageBitmap());
+        }else{
+            iv.setImageBitmap(null);
+            iv.setBackgroundColor(Color.BLUE);
+            iv.setMaxHeight(1);
+            iv.setVisibility(ImageView.INVISIBLE);
         }
 
 
+
+        ImageView iconv=clFromXml.findViewById(R.id.icon_image);
+        if ( ! "".equals(aPopup.getImageIconUrl()) && aPopup.getImageIconBitmap() != null) {
+            iconv.setImageBitmap(aPopup.getImageIconBitmap());
+        }else{
+            iconv.setImageBitmap(null);
+            iconv.setMaxHeight(1);
+            iconv.setBackgroundColor(Color.BLUE);
+            iconv.setVisibility(ImageView.INVISIBLE);
+        }
+
         TextView title=clFromXml.findViewById(R.id.title);
+        if ( ! aPopup.getTextBackgroundColor().equals(-1) ) {
+            title.setBackgroundColor(aPopup.getTextBackgroundColor());
+        }
         if ( ! "".equals(aPopup.getMessage())) {
             title.setText(aPopup.getMessage());
+            title.setHeight(aPopup.getTextHeight());
         }else{
+            title.setHeight(1);
             title.setVisibility(TextView.INVISIBLE);
         }
 
@@ -179,13 +257,6 @@ public class OverlayService extends Service  {
             detail.setHeight(1);
             detail.setVisibility(TextView.INVISIBLE);
         }
-
-        ImageView iv=clFromXml.findViewById(R.id.header_image);
-        if ( ! "".equals(aPopup.getImageUrl()) && aPopup.getImageBitmap() != null) {
-            iv.setImageBitmap(aPopup.getImageBitmap());
-        }else{
-            iv.setImageBitmap(null);
-           }
 
 
 
@@ -201,8 +272,9 @@ public class OverlayService extends Service  {
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
                 PixelFormat.TRANSLUCENT);
         params.gravity = Gravity.END | Gravity.TOP;
-        params.x = 5;
-        params.y = 5;
+
+        params.x=aPopup.getxMargin();
+        params.y = aPopup.getyMargin();
 
         wm.addView(clFromXml, params);
         Thread aThread=new Thread( () -> {
